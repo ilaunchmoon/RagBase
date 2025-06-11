@@ -24,6 +24,15 @@
         领域特定知识库构建: 如内部流程文档、医疗护理手册等, RAPTOR帮助快速整个内容搜索和摘要理解
         多粒度检索系统：对既需事实性，又需主题性回答的系统尤其适合
 
+    示例说明:
+
+        整个系统构建了一个 **"嵌入→聚类→总结→递归处理"** 的流水线
+
+        文档嵌入：将文本转换为高维向量表示
+        层次化聚类：通过全局和局部降维与聚类，将文档组织成主题层次结构
+        递归总结：对每个聚类生成摘要，并将这些摘要作为下一级处理的输入
+        向量存储构建：将原始文档和各级摘要整合到向量存储中
+        RAG 系统：利用优化后的向量存储提供更准确的检索结果
 """
 import umap  # 导入UMAP用于降维和聚类
 import numpy as np  # 导入numpy用于数值计算
@@ -123,8 +132,6 @@ model = ChatOpenAI(temperature=0, model="gpt-4-1106-preview")  # 注释掉的Ope
 
 
 RANDOM_SEED = 224  # 设置随机种子，确保结果可复现
-
-### --- Code from citations referenced above (added comments and docstrings) --- ###
 
 
 def global_cluster_embeddings(
@@ -337,9 +344,6 @@ def perform_clustering(
         total_clusters += n_local_clusters  # 更新总聚类数
 
     return all_local_clusters  # 返回所有样本的局部聚类结果
-
-
-### --- Our code below --- ###
 
 
 def embed(texts):
