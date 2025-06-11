@@ -15,15 +15,32 @@ _ = load_dotenv(find_dotenv())
 
 """
    Indexing之colBert模型来做Indexing技术
-    ColBERT (Contextualized Late Interaction over BERT) 是一种 上下文感知的后期交互 检索模型
+    ColBERT(Contextualized Late Interaction over BERT)采用**多向量(token-level)编码 + 延迟交互(MaxSim)**机制
+    兼顾 BERT 上下文理解能力与高效大规模检索，支持离线预编码文档，并在在线查询时高效匹配
     使用预训练模型ColBert将文档生成稠密嵌入向量, 它能表征丰富的语义信息
-    加速查询响应：避免在查询时对整个文档库进行线性扫描
-    提高检索质量：通过向量表示捕获语义信息
-    优化资源利用：减少计算开销和内存占用
+   
+
+    解决的问题
+        高效与准确兼顾：比单向量检索表现出更细粒度的匹配，同时避免 cross-encoder 的高昂成本
+        覆盖稀有名词与长尾查询：每个 token 都参与匹配，解决 dense-passage对 uncommon terms 的弱覆盖问题
+        支持端到端大规模检索：无需先 BM25, 再 re-rank, ColBERT 可直接用向量索引与 MaxSim 完成 retrieval
+        加速查询响应：避免在查询时对整个文档库进行线性扫描
+        提高检索质量：通过向量表示捕获语义信息
+        优化资源利用：减少计算开销和内存占用
+
+    步骤
+        1. 文档加载与分割
+        2. 文档嵌入
+        3. 离线存储嵌入文本和对话记录
+        4. 查询
+        5. 检索
 
 
     适用场景
-
+        RAG enhanced retrieval: 在生成之前用 ColBERT reranker 对初检结果精排，提升 LLM 对上下文的利用度
+        端到端 open-domain QA: 支持海量文档直接检索，性能媲美或优于传统 DPR + BM25 pipelin
+        长尾和行业领域问答：对不常见词、高专业度内容（如技术文档、法规、医学文本）更具鲁棒性
+        支持多语言 / 跨域检索：由于 token 表示语义丰富, 易于迁移到新语种与领域
 
 """
 
@@ -34,7 +51,7 @@ except ImportError:
     from torch.optim import AdamW
     import transformers
     transformers.AdamW = AdamW
-    
+
 
 # 加载ColBERTv2.0预训练的检索增强生成(RAG)模型
 RAG = RAGPretrainedModel.from_pretrained("colbert-ir/colbertv2.0")
