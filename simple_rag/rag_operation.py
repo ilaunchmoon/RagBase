@@ -6,6 +6,8 @@ from langchain_community.vectorstores import Chroma                         # �
 from langchain_core.output_parsers import StrOutputParser                   # 结构化输出解析, str数据解析
 from langchain_core.runnables import RunnablePassthrough                    # 支持在链式调用中, 用于参数输入, 传递输入不做任何修改
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings                   # OpenAI模型的文档嵌入模型
+from langchain_community.vectorstores import Chroma, FAISS, ElasticsearchStore
+
 
 from dotenv import load_dotenv, find_dotenv
 
